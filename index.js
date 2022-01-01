@@ -4,8 +4,11 @@ const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-serve
 const typeDefs = gql`
   
   type Book {
+    id: ID!
     title: String
     author: String
+    isPublished: Boolean
+    score: Float
   }
 
   type Query {
@@ -15,7 +18,13 @@ const typeDefs = gql`
 
 const resolvers = {
     Query: {
-        books: () => [{ title: 'Çalıkuşu', author: 'Reşat Nuri Güntekin' }],
+        books: () => [{
+            id: "sdfsdfsdfc23",
+            title: 'Çalıkuşu',
+            author: 'Reşat Nuri Güntekin',
+            score: 9.8,
+            isPublished: true
+        }],
     }
 };
 
