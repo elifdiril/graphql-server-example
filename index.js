@@ -4,19 +4,19 @@ const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-serve
 const {authors, books} = require('./data');
 
 const typeDefs = gql`
-
   type Author {
     id: ID!
     name: String!
     surname: String
-    age: Int
     books: [Book!]
+    age: Int
   }
   
   type Book {
     id: ID!
     title: String!
-    author:Author 
+    author: Author!
+    author_id: String! 
     isPublished: Boolean
     score: Float
   }
@@ -41,6 +41,11 @@ const resolvers = {
         author: (parent, args) => {
             const data = authors.find((author) => author.id === args.id);
             return data;
+        }
+    },
+    Book: {
+        author: (parent) => {
+            return authors.find((author) => author.id === parent.author_id);
         }
     }
 };
