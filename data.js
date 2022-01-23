@@ -17,6 +17,13 @@ const books = [{
     isPublished: true
 },
 {
+    id: "sdfsdfsdf",
+    title: 'Dsdfsdf',
+    author_id: "1",
+    score: 7.8,
+    isPublished: false
+},
+{
     id: "sdfsdfsdfc2",
     title: 'Deneme',
     author_id: "2",

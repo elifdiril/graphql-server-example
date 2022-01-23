@@ -8,7 +8,7 @@ const typeDefs = gql`
     id: ID!
     name: String!
     surname: String
-    books: [Book!]
+    books(filter: String): [Book!]
     age: Int
   }
   
@@ -48,7 +48,15 @@ const resolvers = {
         
     },
     Author: {
-        books: (parent) => books.filter((book) => book.author_id === parent.id)
+        books: (parent, args) => {
+            let filtered = books.filter((book) => book.author_id === parent.id);
+
+            if(args.filter){
+                filtered = filtered.filter((book) => book.title.toLowerCase().startsWith(args.filter.toLowerCase()));
+            }
+
+            return filtered;
+        }
     }
 };
 
