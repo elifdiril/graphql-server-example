@@ -24,3 +24,28 @@ npm run dev
 ```
 
 to start the development mode.
+
+Example mutation queries: 
+
+``` sql
+mutation cA {
+  createAuthor(data: { name: "adsf", surname: "sf", age: 12 }) {
+    name
+    surname
+    books {
+      title
+    }
+  }
+}
+
+mutation cB {
+  createBook(
+    data: { title: "dsfsd", author_id: "1", isPublished: true, score: 5.4 }
+  ) {
+    title
+    author {
+      name
+    }
+  }
+}
+```
