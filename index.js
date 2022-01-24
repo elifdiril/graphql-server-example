@@ -1,7 +1,8 @@
 const { ApolloServer, gql } = require('apollo-server');
 const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
+const { nanoid } = require('nanoid');
 
-const {authors, books} = require('./data');
+const { authors, books } = require('./data');
 
 const typeDefs = gql`
   type Author {
@@ -24,12 +25,34 @@ const typeDefs = gql`
   type Query {
     books: [Book!]
     book(id: ID): Book!
-    authors: [Author!]
+    authors: [Author]
     author(id: ID): Author!
+  }
+
+  type Mutation {
+    createAuthor(name: String!, surname: String!, age: Int!): Author!,
+    createBook(title: String!, author_id: String!, isPublished: Boolean!, score: Float!): Book!
   }
 `;
 
 const resolvers = {
+    Mutation: {
+        createAuthor: (parent, { name, surname, age }) => {
+            const author = {
+                id: nanoid(), name, surname, age
+            }
+            authors.push(author);
+            return author;
+        },
+        createBook: (parent, { title, author_id, isPublished, score }) => {
+            const book = {
+                id: nanoid(), title, author_id, isPublished, score
+            }
+            books.push(book);
+            return book;
+        }
+    },
+
     Query: {
         books: () => books,
         book: (parent, args) => {
@@ -45,13 +68,13 @@ const resolvers = {
     },
     Book: {
         author: (parent) => authors.find((author) => author.id === parent.author_id)
-        
+
     },
     Author: {
         books: (parent, args) => {
             let filtered = books.filter((book) => book.author_id === parent.id);
 
-            if(args.filter){
+            if (args.filter) {
                 filtered = filtered.filter((book) => book.title.toLowerCase().startsWith(args.filter.toLowerCase()));
             }
 

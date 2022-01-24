@@ -1,12 +1,14 @@
 const authors = [{
     id: "1",
     name: "Reşat Nuri",
-    surname: "Güntekin"
+    surname: "Güntekin",
+    age: 72
 },
 {
     id: "2",
     name: "Elif",
-    surname: "Diril"
+    surname: "Diril",
+    age: 25
 }]
 
 const books = [{
