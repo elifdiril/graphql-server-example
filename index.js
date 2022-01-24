@@ -30,23 +30,39 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    createAuthor(name: String!, surname: String!, age: Int!): Author!,
-    createBook(title: String!, author_id: String!, isPublished: Boolean!, score: Float!): Book!
+    createAuthor(data: inputCreateAuthor!): Author!,
+    createBook(data: inputCreateBook!): Book!
   }
+
+  input inputCreateAuthor{ 
+      name: String!
+      surname: String! 
+      age: Int! 
+  }
+
+  input inputCreateBook {
+    title: String! 
+    author_id: String! 
+    isPublished: Boolean! 
+    score: Float!
+  }
+  
 `;
 
 const resolvers = {
     Mutation: {
-        createAuthor: (parent, { name, surname, age }) => {
+        createAuthor: (parent, {data}) => {
             const author = {
-                id: nanoid(), name, surname, age
+                id: nanoid(), 
+                ...data
             }
             authors.push(author);
             return author;
         },
-        createBook: (parent, { title, author_id, isPublished, score }) => {
+        createBook: (parent, { data }) => {
             const book = {
-                id: nanoid(), title, author_id, isPublished, score
+                id: nanoid(), 
+                ...data
             }
             books.push(book);
             return book;
