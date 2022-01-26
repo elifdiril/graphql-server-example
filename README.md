@@ -53,6 +53,14 @@ mutation uA {
   }
 }
 
+mutation dA {
+  deleteAuthor(id: 1) {
+    id
+    name
+    surname
+  }
+}
+
 mutation cB {
   createBook(
     data: { title: "dsfsd", author_id: "1", isPublished: true, score: 5.4 }
@@ -69,6 +77,16 @@ mutation uB {
     id: "w9U3F1TqeILkzzWcKJQeq"
     data: { title: "sef", author_id: "1", isPublished: true, score: 7.4 }
   ) {
+    title
+    author {
+      name
+    }
+  }
+}
+
+mutation dB {
+  deleteBook(id: "sdfsdfsdfc23") {
+    id
     title
     author {
       name
