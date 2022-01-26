@@ -28,6 +28,7 @@ to start the development mode.
 Example mutation queries: 
 
 ``` sql
+
 mutation cA {
   createAuthor(data: { name: "cdd", surname: "sf", age: 12 }) {
     id
@@ -58,6 +59,12 @@ mutation dA {
     id
     name
     surname
+  }
+}
+
+mutation daa {
+  deleteAllAuthors {
+    count
   }
 }
 
@@ -93,5 +100,12 @@ mutation dB {
     }
   }
 }
+
+mutation dab {
+  deleteAllBooks {
+    count
+  }
+}
+
 
 ```
