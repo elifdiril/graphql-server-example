@@ -32,9 +32,11 @@ const typeDefs = gql`
   type Mutation {
     createAuthor(data: inputCreateAuthor!): Author!
     updateAuthor(id: ID!, data: inputUpdateAuthor!): Author!
+    deleteAuthor(id: ID!): Author!
 
     createBook(data: inputCreateBook!): Book!
     updateBook(id: ID!, data: inputUpdateBook!): Book!
+    deleteBook(id: ID!): Book!
   }
 
   input inputCreateAuthor{ 
@@ -78,10 +80,10 @@ const resolvers = {
         },
 
         updateAuthor: (parent, {id, data}) => {
-            const author_index = authors.findIndex(user => user.id === id);
+            const author_index = authors.findIndex(author => author.id === id);
 
             if(author_index === -1){
-                throw new Error("User not found!");
+                throw new Error("Author not found!");
             }
 
             const updatedUser = (authors[author_index] = {
@@ -90,6 +92,19 @@ const resolvers = {
             });
 
             return updatedUser;
+        },
+
+        deleteAuthor: (parent, {id}) => {
+            const author_index = authors.findIndex(author => author.id === id);
+
+            if(author_index === -1){
+                throw new Error("Author not found!");
+            }
+
+            const deletedAuthor = authors[author_index];
+            authors.splice(author_index, 1);
+
+            return deletedAuthor;
         },
 
 
@@ -116,6 +131,19 @@ const resolvers = {
             });
 
             return updatedBook;
+        },
+
+        deleteBook: (parent, {id}) => {
+            const book_index = books.findIndex(book => book.id === id);
+
+            if(book_index === -1){
+                throw new Error("Book not found!");
+            }
+
+            const deletedBook = books[book_index];
+            books.splice(book_index, 1);
+
+            return deletedBook;
         },
     },
 
