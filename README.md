@@ -29,12 +29,27 @@ Example mutation queries:
 
 ``` sql
 mutation cA {
-  createAuthor(data: { name: "adsf", surname: "sf", age: 12 }) {
+  createAuthor(data: { name: "cdd", surname: "sf", age: 12 }) {
+    id
     name
     surname
     books {
       title
     }
+  }
+}
+
+mutation uA {
+  updateAuthor(
+    id: "sLjMlaAJh6lXP5s4hhxeY"
+    data: { name: "d", surname: "sf", age: 21 }
+  ) {
+    name
+    surname
+    books {
+      title
+    }
+    age
   }
 }
 
@@ -48,4 +63,17 @@ mutation cB {
     }
   }
 }
+
+mutation uB {
+  updateBook(
+    id: "w9U3F1TqeILkzzWcKJQeq"
+    data: { title: "sef", author_id: "1", isPublished: true, score: 7.4 }
+  ) {
+    title
+    author {
+      name
+    }
+  }
+}
+
 ```

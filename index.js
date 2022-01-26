@@ -34,6 +34,7 @@ const typeDefs = gql`
     updateAuthor(id: ID!, data: inputUpdateAuthor!): Author!
 
     createBook(data: inputCreateBook!): Book!
+    updateBook(id: ID!, data: inputUpdateBook!): Book!
   }
 
   input inputCreateAuthor{ 
@@ -49,6 +50,13 @@ const typeDefs = gql`
 }
 
   input inputCreateBook {
+    title: String! 
+    author_id: String! 
+    isPublished: Boolean! 
+    score: Float!
+  }
+
+  input inputUpdateBook {
     title: String! 
     author_id: String! 
     isPublished: Boolean! 
@@ -93,6 +101,21 @@ const resolvers = {
             }
             books.push(book);
             return book;
+        },
+
+        updateBook: (parent, {id, data}) => {
+            const book_index = books.findIndex(book => book.id === id);
+
+            if(book_index === -1){
+                throw new Error("Book not found!");
+            }
+
+            const updatedBook = (books[book_index] = {
+                ...books[book_index],
+                ...data
+            });
+
+            return updatedBook;
         },
     },
 
