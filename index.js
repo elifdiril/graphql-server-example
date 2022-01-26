@@ -30,7 +30,9 @@ const typeDefs = gql`
   }
 
   type Mutation {
-    createAuthor(data: inputCreateAuthor!): Author!,
+    createAuthor(data: inputCreateAuthor!): Author!
+    updateAuthor(id: ID!, data: inputUpdateAuthor!): Author!
+
     createBook(data: inputCreateBook!): Book!
   }
 
@@ -39,6 +41,12 @@ const typeDefs = gql`
       surname: String! 
       age: Int! 
   }
+
+  input inputUpdateAuthor{ 
+    name: String
+    surname: String 
+    age: Int
+}
 
   input inputCreateBook {
     title: String! 
@@ -51,6 +59,7 @@ const typeDefs = gql`
 
 const resolvers = {
     Mutation: {
+        //author
         createAuthor: (parent, {data}) => {
             const author = {
                 id: nanoid(), 
@@ -59,6 +68,24 @@ const resolvers = {
             authors.push(author);
             return author;
         },
+
+        updateAuthor: (parent, {id, data}) => {
+            const author_index = authors.findIndex(user => user.id === id);
+
+            if(author_index === -1){
+                throw new Error("User not found!");
+            }
+
+            const updatedUser = (authors[author_index] = {
+                ...authors[author_index],
+                ...data
+            });
+
+            return updatedUser;
+        },
+
+
+        //book
         createBook: (parent, { data }) => {
             const book = {
                 id: nanoid(), 
@@ -66,7 +93,7 @@ const resolvers = {
             }
             books.push(book);
             return book;
-        }
+        },
     },
 
     Query: {
