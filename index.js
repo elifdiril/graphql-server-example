@@ -22,6 +22,10 @@ const typeDefs = gql`
     score: Float
   }
 
+  type DeleteAll {
+      count: Int!
+  }
+
   type Query {
     books: [Book!]
     book(id: ID): Book!
@@ -33,10 +37,12 @@ const typeDefs = gql`
     createAuthor(data: inputCreateAuthor!): Author!
     updateAuthor(id: ID!, data: inputUpdateAuthor!): Author!
     deleteAuthor(id: ID!): Author!
+    deleteAllAuthors: DeleteAll!
 
     createBook(data: inputCreateBook!): Book!
     updateBook(id: ID!, data: inputUpdateBook!): Book!
     deleteBook(id: ID!): Book!
+    deleteAllBooks: DeleteAll!
   }
 
   input inputCreateAuthor{ 
@@ -70,19 +76,19 @@ const typeDefs = gql`
 const resolvers = {
     Mutation: {
         //author
-        createAuthor: (parent, {data}) => {
+        createAuthor: (parent, { data }) => {
             const author = {
-                id: nanoid(), 
+                id: nanoid(),
                 ...data
             }
             authors.push(author);
             return author;
         },
 
-        updateAuthor: (parent, {id, data}) => {
+        updateAuthor: (parent, { id, data }) => {
             const author_index = authors.findIndex(author => author.id === id);
 
-            if(author_index === -1){
+            if (author_index === -1) {
                 throw new Error("Author not found!");
             }
 
@@ -94,10 +100,10 @@ const resolvers = {
             return updatedUser;
         },
 
-        deleteAuthor: (parent, {id}) => {
+        deleteAuthor: (parent, { id }) => {
             const author_index = authors.findIndex(author => author.id === id);
 
-            if(author_index === -1){
+            if (author_index === -1) {
                 throw new Error("Author not found!");
             }
 
@@ -107,21 +113,28 @@ const resolvers = {
             return deletedAuthor;
         },
 
+        deleteAllAuthors: () => {
+            const count = authors.length;
+
+            authors.splice(0, count);
+
+            return { count };
+        },
 
         //book
         createBook: (parent, { data }) => {
             const book = {
-                id: nanoid(), 
+                id: nanoid(),
                 ...data
             }
             books.push(book);
             return book;
         },
 
-        updateBook: (parent, {id, data}) => {
+        updateBook: (parent, { id, data }) => {
             const book_index = books.findIndex(book => book.id === id);
 
-            if(book_index === -1){
+            if (book_index === -1) {
                 throw new Error("Book not found!");
             }
 
@@ -133,10 +146,10 @@ const resolvers = {
             return updatedBook;
         },
 
-        deleteBook: (parent, {id}) => {
+        deleteBook: (parent, { id }) => {
             const book_index = books.findIndex(book => book.id === id);
 
-            if(book_index === -1){
+            if (book_index === -1) {
                 throw new Error("Book not found!");
             }
 
@@ -144,6 +157,14 @@ const resolvers = {
             books.splice(book_index, 1);
 
             return deletedBook;
+        },
+
+        deleteAllBooks: () => {
+            const count = books.length;
+
+            books.splice(0, count);
+
+            return { count };
         },
     },
 
