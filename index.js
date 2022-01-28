@@ -1,10 +1,9 @@
-const { ApolloServer, gql } = require('apollo-server');
-const { ApolloServerPluginLandingPageGraphQLPlayground } = require('apollo-server-core');
 const { nanoid } = require('nanoid');
+const { GraphQLServer, PubSub } = require('graphql-yoga');
 
 const { authors, books } = require('./data');
 
-const typeDefs = gql`
+const typeDefs = `
   type Author {
     id: ID!
     name: String!
@@ -71,21 +70,44 @@ const typeDefs = gql`
     score: Float!
   }
   
+  type Subscription {
+      authorCreated: Author!
+      authorUpdated: Author!
+      authorDeleted: Author!
+      allAuthorsDeleted: Int!
+  }
 `;
 
 const resolvers = {
+    Subscription: {
+        authorCreated:{
+            subscribe: (_, __, {pubsub}) => pubsub.asyncIterator('authorCreated')
+        },
+        authorUpdated: {
+            subscribe: (_, __, {pubsub}) => pubsub.asyncIterator('authorUpdated')
+        },
+        authorDeleted: {
+            subscribe: (_, __, {pubsub}) => pubsub.asyncIterator('authorDeleted')
+        },
+        allAuthorsDeleted: {
+            subscribe: (_, __, {pubsub}) => pubsub.asyncIterator('allAuthorsDeleted')
+        }
+    },
+
     Mutation: {
         //author
-        createAuthor: (parent, { data }) => {
+        createAuthor: (_, { data }, {pubsub}) => {
             const author = {
                 id: nanoid(),
                 ...data
             }
             authors.push(author);
+            pubsub.publish('authorCreated', {authorCreated: author});
+
             return author;
         },
 
-        updateAuthor: (parent, { id, data }) => {
+        updateAuthor: (_, { id, data }, {pubsub}) => {
             const author_index = authors.findIndex(author => author.id === id);
 
             if (author_index === -1) {
@@ -96,11 +118,12 @@ const resolvers = {
                 ...authors[author_index],
                 ...data
             });
-
+            pubsub.publish('authorUpdated', {authorUpdated: updatedUser});
+            
             return updatedUser;
         },
 
-        deleteAuthor: (parent, { id }) => {
+        deleteAuthor: (_, { id },  {pubsub}) => {
             const author_index = authors.findIndex(author => author.id === id);
 
             if (author_index === -1) {
@@ -109,6 +132,7 @@ const resolvers = {
 
             const deletedAuthor = authors[author_index];
             authors.splice(author_index, 1);
+            pubsub.publish('authorDeleted', {authorDeleted: deletedAuthor});
 
             return deletedAuthor;
         },
@@ -117,6 +141,7 @@ const resolvers = {
             const count = authors.length;
 
             authors.splice(0, count);
+            pubsub.publish('allAuthorsDeleted', {allAuthorsDeleted: count});
 
             return { count };
         },
@@ -167,7 +192,6 @@ const resolvers = {
             return { count };
         },
     },
-
     Query: {
         books: () => books,
         book: (parent, args) => {
@@ -198,13 +222,7 @@ const resolvers = {
     }
 };
 
-const server = new ApolloServer({
-    typeDefs, resolvers,
-    plugins: [
-        ApolloServerPluginLandingPageGraphQLPlayground({
-            // options
-        })
-    ]
-});
+const pubsub = new PubSub();
+const server = new GraphQLServer({ typeDefs, resolvers, context: { pubsub } });
 
-server.listen().then(({ url }) => console.log(`Apollo server is up to ${url}`));
+server.start(() => console.log('Server is running on http://localhost:4000/'));
