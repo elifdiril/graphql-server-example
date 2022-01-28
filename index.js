@@ -1,5 +1,5 @@
 const { nanoid } = require('nanoid');
-const { GraphQLServer, PubSub } = require('graphql-yoga');
+const { GraphQLServer, PubSub, withFilter } = require('graphql-yoga');
 
 const { authors, books } = require('./data');
 
@@ -71,8 +71,8 @@ const typeDefs = `
   }
   
   type Subscription {
-      authorCreated: Author!
-      authorUpdated: Author!
+      authorCreated(id: ID): Author!
+      authorUpdated(id: ID): Author!
       authorDeleted: Author!
       allAuthorsDeleted: Int!
 
@@ -86,10 +86,17 @@ const typeDefs = `
 const resolvers = {
     Subscription: {
         authorCreated: {
-            subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('authorCreated')
+            subscribe: withFilter((_, __, { pubsub }) => pubsub.asyncIterator('authorCreated'),
+                (payload, variables) => {
+                    return variables.id ? (payload.authorCreated.id === variables.id) : true;
+                })
         },
         authorUpdated: {
-            subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('authorUpdated')
+            subscribe: withFilter((_, __, { pubsub }) => pubsub.asyncIterator('authorUpdated'),
+                (payload, variables) => {
+                    return variables.id ? (payload.authorUpdated.id === variables.id) : true;
+                }
+            )
         },
         authorDeleted: {
             subscribe: (_, __, { pubsub }) => pubsub.asyncIterator('authorDeleted')
